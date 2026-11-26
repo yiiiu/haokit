@@ -116,8 +116,9 @@ deploy/                    # Caddyfile、systemd 服务、journald 日志上限�
 public/
   index.html               # 外壳：侧边栏（logo、搜索、导航、主题）+ 悬浮内容面板；服务器在这里写入每页的 SEO 标签
   favicon.ico、site.webmanifest
-  brand/                   # 网站实际使用的 logo 和图标（含深色模式的浅色字标版本）
-  haokit-logo-assets/      # logo 原始素材
+  brand/                   # 网站实际使用的 logo 和图标，由 haokit-rose-assets 整理而来（含深色模式的浅色字标版本）
+  haokit-rose-assets/      # 当前 logo 原始素材（玫红版）
+  haokit-logo-assets/      # 旧版黑金 logo 素材，网站已不再使用
   assets/
     app.css                # 设计变量（深浅色）、外壳、通用组件、首页
     app.js                 # 路由（真实路径，兼容旧 #/ 链接）、导航搜索、「/」快捷键、主题（浅色/深色/自动）
