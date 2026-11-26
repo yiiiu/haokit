@@ -33,7 +33,17 @@ export const config = {
     perIp: num(process.env.MAX_CONCURRENT_PER_IP, 5),
     queueMs: num(process.env.FETCH_QUEUE_TIMEOUT_SEC, 30) * 1000,
   },
+  // Cloudflare Web Analytics 的站点令牌；不填就不加载统计脚本（本地开发默认不统计）
+  cfAnalyticsToken: parseToken(process.env.CF_ANALYTICS_TOKEN),
 };
+
+function parseToken(v) {
+  const token = (v || '').trim();
+  if (!token) return '';
+  if (/^[A-Za-z0-9]{16,64}$/.test(token)) return token;
+  console.warn('[config] CF_ANALYTICS_TOKEN 格式不对（应为 Cloudflare 后台给的一串字母数字），访问统计未开启');
+  return '';
+}
 
 const LOOPBACK = /^(127\.|::1$|::ffff:127\.)/;
 

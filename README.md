@@ -43,6 +43,7 @@ npm run dev        # 开发模式，改动后端代码自动重启
 
 - 取件接口按 IP 限流、限制并发（`server/lib/rate-limit.js`、`server/lib/limiter.js`），超出返回 429 / 503 和中文提示。
 - 安全响应头（`server/lib/security.js`）：内容安全策略只允许本站脚本，index.html 里的内联主题脚本按哈希放行（服务器自动计算）；邮件正文的 iframe 会继承这套策略，所以放行了外部图片、样式和字体，脚本仍然禁止。HTTPS 请求加 HSTS。
+- 访问统计：设置环境变量 `CF_ANALYTICS_TOKEN` 后，服务器在每个页面末尾加上 Cloudflare Web Analytics 的统计脚本，同时在 CSP 里放行它，并把 Referrer-Policy 从 `no-referrer` 改为 `strict-origin`（Cloudflare 要靠来源域名识别网站）。不设置就完全不统计。隐私说明页会根据页面里有没有统计脚本自动切换说明。
 - 日志规则：只打印错误信息，永远不要打印 `req.body` 或请求头——取件请求里有用户的 refresh_token。
 
 ## Outlook 取件

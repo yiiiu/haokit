@@ -112,6 +112,40 @@ cd /opt/haokit && sudo git fetch --tags && sudo git checkout v1.0.1 && sudo npm 
 - 搜索引擎：在百度搜索资源平台和 Google Search Console 验证网站，提交 `https://haokit.run/sitemap.xml`。
 - 隐私说明：`public/tools/privacy.js` 里的「联系方式」还是「待补充」，上线前填上。
 
+## 访问统计
+
+用 Cloudflare Web Analytics，免费、不用 Cookie，域名不用迁到 Cloudflare。
+
+1. 注册并登录 Cloudflare，进入左侧的 **Web Analytics**，点 **Add a site**，填 `haokit.run`，点 **Done**。
+2. 在 **Manage site** 里显示的代码中，复制 `"token": "…"` 引号里的那串字母数字。
+3. 在 `/etc/haokit.env` 里加一行 `CF_ANALYTICS_TOKEN=刚才那串`，然后重启：
+
+```bash
+sudo systemctl restart haokit
+```
+
+4. 检查是否生效（有输出就对了），几分钟后 Cloudflare 后台开始出数据：
+
+```bash
+curl -s https://haokit.run/ | grep -o "cloudflareinsights[^\"]*"
+```
+
+开启后服务器会自动放行统计脚本的安全策略（CSP），隐私说明页也会自动换成「使用了 Cloudflare 统计」的说明，不用改代码。
+
+- 能看到：访问量、访客数、每个工具页（`/outlook`、`/2fa`、`/convert`）的访问次数、来源网站、国家、浏览器和设备、页面加载速度；站内切换工具也会统计。数据保留 6 个月。
+- 看不到：用了广告拦截插件的访客；具体取件了多少次（取件请求不经过统计脚本）。
+- 域名套了 Cloudflare 代理（橙色云朵）时，Web Analytics 可能默认开启「自动注入」。到 **Manage site** 改成 **Enable with JS Snippet installation**，只用我们自己加的这段代码，避免重复统计。
+
+取件次数从 Caddy 访问日志里数（按天统计，包含自动刷新；只算当前日志文件）：
+
+```bash
+sudo apt-get install -y jq
+```
+
+```bash
+sudo jq -r 'select(.request.method=="POST" and .request.uri=="/api/outlook/messages") | .ts | floor | strftime("%Y-%m-%d")' /var/log/caddy/haokit.access.log | sort | uniq -c
+```
+
 ## 日志里有什么
 
 - Caddy 访问日志（`/var/log/caddy/haokit.access.log`）：时间、IP、方法、路径、状态码、耗时；请求头和响应头已删除，不记录请求内容；每个文件 20 MB，保留 10 个。

@@ -2,7 +2,7 @@
 // 这样不执行 JavaScript 的搜索引擎（比如百度）也能看到每一页各自的内容。另外生成 robots.txt 和 sitemap.xml。
 import { tools } from '../../public/tools/registry.js';
 import { SITE, PAGES, LEGACY_IDS } from '../../public/assets/site.js';
-import { siteBase } from './config.js';
+import { config, siteBase } from './config.js';
 import { template } from './template.js';
 
 const BUILT = new Date().toISOString().slice(0, 10);
@@ -63,6 +63,16 @@ function noscriptBody(page) {
         </section></noscript>`;
 }
 
+/**
+ * Cloudflare Web Analytics 统计脚本：不用 Cookie，会自动统计站内切换页面（History API）。
+ * 令牌只含字母数字（config.js 里校验过），可以直接放进属性里
+ */
+function analyticsTag() {
+  const token = config.cfAnalyticsToken;
+  if (!token) return '';
+  return `<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${token}"}'></script>\n`;
+}
+
 /** GET / HEAD 页面请求 */
 export function renderPage(req, res) {
   let id = req.path.replace(/^\/+|\/+$/g, '');
@@ -79,7 +89,8 @@ export function renderPage(req, res) {
   const { html } = template();
   const out = html
     .replace(/<title>[\s\S]*?<\/title>/, headTags(page, siteBase(req), status))
-    .replace('<!--seo-body-->', noscriptBody(page));
+    .replace('<!--seo-body-->', noscriptBody(page))
+    .replace('</body>', `${analyticsTag()}</body>`);
 
   res.status(status).set('Cache-Control', 'no-cache').type('html').send(out);
 }

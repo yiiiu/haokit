@@ -1,7 +1,23 @@
 // 隐私说明页（初稿，上线前请根据实际情况审核修改，特别是「联系方式」）
 import { SITE } from '../assets/site.js';
 
-const UPDATED = '2026 年 11 月 26 日';
+const UPDATED = '2026 年 11 月 27 日';
+
+// 服务器配置了 CF_ANALYTICS_TOKEN 时，页面里会有 Cloudflare 的统计脚本，这一段说明跟着切换
+const analyticsEnabled = () => Boolean(document.querySelector('script[src*="cloudflareinsights.com"]'));
+
+const ANALYTICS_ON = `
+      <p>本站使用 Cloudflare Web Analytics 统计访问量和页面加载速度，用来了解哪些工具有人在用、页面打开快不快。</p>
+      <ul>
+        <li>统计的内容：访问的页面地址（不含问号后面的参数）、从哪个网站点进来、浏览器和设备类型、所在国家或地区（由 Cloudflare 根据 IP 判断），以及页面加载耗时。</li>
+        <li>不统计的内容：你在工具里输入或粘贴的任何东西（账号、令牌、密钥、邮件）都不会发给统计服务。</li>
+        <li>它不使用 Cookie。统计脚本从 static.cloudflareinsights.com 加载，数据发送到 cloudflareinsights.com，由 Cloudflare 按其隐私政策处理。</li>
+      </ul>
+      <p>为了让 Cloudflare 识别是哪个网站的访问，浏览器向它发送请求时会带上本站域名（不带具体页面）。使用广告拦截插件时统计脚本可能被拦截，不影响使用工具。</p>
+      <p>除此之外，本站没有广告或其他第三方追踪代码。</p>`;
+
+const ANALYTICS_OFF = `
+      <p>目前没有使用任何访问统计、广告或第三方追踪代码。以后如果加入，会先更新这页说明。</p>`;
 
 export function mount(el) {
   el.innerHTML = `
@@ -27,7 +43,7 @@ export function mount(el) {
       <p>为了防止接口被滥用，取件接口按 IP 限制请求频率。计数只保存在服务器内存里，服务重启后清空，不做其他用途。</p>
 
       <h2>统计与第三方</h2>
-      <p>目前没有使用任何访问统计、广告或第三方追踪代码。以后如果加入，会先更新这页说明。</p>
+      ${analyticsEnabled() ? ANALYTICS_ON : ANALYTICS_OFF}
 
       <h2>商标与免责声明</h2>
       <p>Outlook、Hotmail、Microsoft 是微软公司的商标，Google Authenticator 是 Google 的商标。${SITE.name}与这些公司没有关联。</p>

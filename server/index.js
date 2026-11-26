@@ -64,4 +64,5 @@ app.use((err, req, res, _next) => {
 
 app.listen(config.port, config.host, () => {
   console.log(`号工具已启动：http://${config.host}:${config.port}`);
+  console.log(`[analytics] 访问统计${config.cfAnalyticsToken ? '已开启（Cloudflare Web Analytics）' : '未开启'}`);
 });
