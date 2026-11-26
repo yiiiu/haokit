@@ -267,6 +267,8 @@ code {
 
 .view { position: relative; flex: 1; min-height: 0; overflow: auto; outline: none; }
 .view-loading { display: grid; place-items: center; height: 100%; min-height: 240px; }
+/* 每个页面的挂载容器：撑满内容区，让多栏工具的内部滚动区域有确定高度 */
+.view-page { height: 100%; }
 
 .scrim { position: fixed; inset: 0; z-index: 45; background: rgba(9, 9, 12, 0.4); }
 

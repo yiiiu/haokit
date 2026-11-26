@@ -119,6 +119,9 @@ function template(s) {
   </div></div>`;
 }
 
+// 切到别的工具再回来时保留原始数据和手动改过的列（只在内存里，刷新页面就没有）
+const session = { text: null, overrides: {}, sig: '' };
+
 export function mount(root) {
   loadCss('/tools/convert/convert.css');
 
@@ -457,9 +460,15 @@ export function mount(root) {
 
   const detachDrop = acceptFileDrop(ref.cq, appendText);
 
+  if (session.text !== null) {
+    ref.input.value = session.text;
+    state.overrides = { ...session.overrides };
+    state.sig = session.sig;
+  }
   refresh();
 
   return () => {
+    Object.assign(session, { text: ref.input.value, overrides: { ...state.overrides }, sig: state.sig });
     clearTimeout(inputTimer);
     detachDrop();
   };

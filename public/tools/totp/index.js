@@ -98,6 +98,9 @@ function template(s) {
   </div></div>`;
 }
 
+// 切到别的工具再回来时保留输入的密钥（只在内存里，刷新页面就没有；要长期保存请勾选「记住密钥」）
+let draft = null;
+
 export function mount(root) {
   loadCss('/tools/totp/totp.css');
 
@@ -375,7 +378,8 @@ export function mount(root) {
   const detachDrop = acceptFileDrop(ref.cq, appendText);
 
   // ---------- 初始化 ----------
-  if (settings.remember) ref.input.value = store.get(SECRETS_KEY, '') || '';
+  if (draft !== null) ref.input.value = draft;
+  else if (settings.remember) ref.input.value = store.get(SECRETS_KEY, '') || '';
   renderAdvState();
   sync();
   state.timer = setInterval(tick, TICK_MS);
@@ -398,6 +402,7 @@ export function mount(root) {
   }
 
   return () => {
+    draft = ref.input.value;
     clearInterval(state.timer);
     clearTimeout(inputTimer);
     document.removeEventListener('visibilitychange', onVisible);

@@ -132,11 +132,17 @@ function template(s) {
   <aside class="drawer" data-ref="drawer" role="dialog" aria-modal="true" aria-label="邮件详情" hidden></aside>`;
 }
 
+// 跨页面保留的数据：模块只加载一次，切到别的工具再回来时账号、已取到的邮件和选中状态都还在，不用重新取件。
+// view 指向当前挂载的界面；页面切走后仍在进行的取件完成时，用它刷新正在显示的界面。
+const session = { accounts: [], selectedKey: null, openMailId: null, filter: '', busy: false, restored: false, view: null };
+
 export function mount(root) {
   loadCss('/tools/outlook/outlook.css');
 
   const settings = { folder: 'inbox', mode: 'auto', top: 10, remember: false, auto: false, codeOnly: false, ...store.get(SETTINGS_KEY, {}) };
-  const state = { accounts: [], selectedKey: null, openMailId: null, pollTimer: null, busy: false, filter: '', importOpen: false };
+  const state = session;
+  // 只属于这一次挂载的东西：定时器、导入弹窗
+  const local = { pollTimer: null, importOpen: false, importModal: null };
 
   root.innerHTML = template(settings);
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((n) => [n.dataset.ref, n]));
@@ -290,8 +296,8 @@ export function mount(root) {
 
   // ---------- 导入弹窗 ----------
   function openImport(prefill = '') {
-    if (state.importOpen) return;
-    state.importOpen = true;
+    if (local.importOpen) return;
+    local.importOpen = true;
     closeSettings();
 
     const m = openModal({
@@ -315,10 +321,12 @@ export function mount(root) {
         <button type="button" class="btn" data-imp="only">只导入</button>
         <button type="button" class="btn primary" data-imp="fetch"></button>`,
       onClose: () => {
-        state.importOpen = false;
+        local.importOpen = false;
+        local.importModal = null;
         detachDrop();
       },
     });
+    local.importModal = m;
 
     const q = (sel) => m.el.querySelector(sel);
     const text = q('.imp-text');
@@ -694,11 +702,18 @@ export function mount(root) {
   resizeObs.observe(ref.cq);
 
   // ---------- 取件 ----------
+  /** 刷新当前显示的界面（取件可能在页面切走后才完成） */
+  function redraw(acc) {
+    const v = session.view;
+    if (!v) return;
+    v.renderList();
+    if (acc.key === session.selectedKey) v.renderMail();
+  }
+
   async function fetchAccount(acc, { silent = false } = {}) {
     if (acc.loading) return;
     acc.loading = true;
-    renderList();
-    if (acc.key === state.selectedKey) renderMail();
+    redraw(acc);
 
     try {
       const data = await api('/api/outlook/messages', {
@@ -729,30 +744,27 @@ export function mount(root) {
       }
     } finally {
       acc.loading = false;
-      if (state.accounts.includes(acc)) {
-        renderList();
-        if (acc.key === state.selectedKey) renderMail();
-      }
+      if (state.accounts.includes(acc)) redraw(acc);
     }
   }
 
   async function fetchMany(list) {
     if (!list.length || state.busy) return;
     state.busy = true;
-    renderAccountsHead();
+    session.view?.renderAccountsHead();
     await runPool([...list], CONCURRENCY, (acc) => fetchAccount(acc));
     state.busy = false;
-    renderAccountsHead();
+    session.view?.renderAccountsHead();
     const failed = list.filter((a) => a.status === 'error').length;
     if (list.length > 1) toast(failed ? `取件完成，${failed} 个账号失败` : `${list.length} 个账号取件完成`, failed ? 'error' : 'ok');
   }
 
   // ---------- 自动刷新 ----------
   function schedulePoll() {
-    clearInterval(state.pollTimer);
-    state.pollTimer = null;
+    clearInterval(local.pollTimer);
+    local.pollTimer = null;
     if (!settings.auto) return;
-    state.pollTimer = setInterval(() => {
+    local.pollTimer = setInterval(() => {
       const acc = selected();
       if (acc && acc.status !== 'idle' && !document.hidden) fetchAccount(acc, { silent: true });
     }, POLL_MS);
@@ -903,7 +915,7 @@ export function mount(root) {
 
   // 在页面空白处直接 ⌘V / Ctrl+V 粘贴账号 → 打开导入弹窗
   const onPaste = (e) => {
-    if (state.importOpen) return;
+    if (local.importOpen) return;
     const t = e.target;
     if (t.closest?.('input, textarea, select, [contenteditable="true"]')) return;
     const text = e.clipboardData?.getData('text') || '';
@@ -917,15 +929,26 @@ export function mount(root) {
   const detachDrop = acceptFileDrop(ref.cq, (text) => openImport(text));
 
   // ---------- 初始化 ----------
-  if (settings.remember) {
-    const saved = store.get(ACCOUNTS_KEY, '');
-    if (saved) addAccounts(parseAccounts(saved).accounts);
+  const view = { renderList, renderMail, renderAccountsHead };
+  session.view = view;
+  ref.filter.value = state.filter;
+  if (!session.restored) {
+    // 本标签页第一次打开取件器时，读取浏览器里记住的账号；之后切页面回来直接用内存里的数据
+    session.restored = true;
+    if (settings.remember) {
+      const saved = store.get(ACCOUNTS_KEY, '');
+      if (saved) addAccounts(parseAccounts(saved).accounts);
+    }
   }
   renderAll();
   schedulePoll();
 
   return () => {
-    clearInterval(state.pollTimer);
+    // 窄屏时阅读用的抽屉会随页面一起消失，回来时不再标记打开的那封邮件
+    if (!isWide()) state.openMailId = null;
+    if (session.view === view) session.view = null;
+    local.importModal?.close();
+    clearInterval(local.pollTimer);
     resizeObs.disconnect();
     detachDrop();
     document.removeEventListener('keydown', onKey);

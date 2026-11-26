@@ -127,13 +127,18 @@ async function route() {
   }
 
   setTitles(tool, groups.find((g) => g.id === tool.group)?.name || '');
-  els.view.innerHTML = '<div class="view-loading"><span class="spinner"></span></div>';
+  // 每个页面挂载到一个新建的容器里，离开时整个容器被替换掉，
+  // 工具绑在容器上的事件监听随之释放，不会在反复进出页面后越叠越多
+  const host = document.createElement('div');
+  host.className = 'view-page';
+  host.innerHTML = '<div class="view-loading"><span class="spinner"></span></div>';
+  els.view.replaceChildren(host);
 
   try {
     const mod = await tool.load();
     if (seq !== routeSeq) return; // 加载期间又切换了路由
-    els.view.innerHTML = '';
-    cleanup = (await mod.mount(els.view, ctx)) || null;
+    host.innerHTML = '';
+    cleanup = (await mod.mount(host, ctx)) || null;
   } catch (err) {
     console.error(err);
     if (seq !== routeSeq) return;
