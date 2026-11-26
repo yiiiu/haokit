@@ -1,0 +1,19 @@
+{
+  "name": "haokit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "号工具（HaoKit）：Outlook / Hotmail 取件、2FA 验证码、账号格式转换等账号工具站",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "5.3.0",
+    "imapflow": "2.11.0",
+    "mailparser": "3.14.3"
+  }
+}

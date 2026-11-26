@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <!-- 下面这行 title 会被服务器替换成每个页面自己的标题、描述、canonical 等 SEO 标签（server/lib/pages.js） -->
+  <title>号工具</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/brand/icon-32.png">
+  <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#f3f3f6">
+  <script>
+    // 在样式加载前确定主题，避免闪烁。app.theme: light | dark | system（默认）
+    // 注意：内容安全策略按这段脚本的哈希值放行，服务器启动时会自动计算，改了也不用手动更新。
+    (function () {
+      var pref;
+      try { pref = localStorage.getItem('app.theme'); } catch (e) {}
+      var dark = pref === 'dark' || (pref !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    })();
+  </script>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="工具导航">
+      <a class="brand" href="/" aria-label="号工具 haokit 首页">
+        <img class="brand-logo brand-logo-light" src="/brand/logo-200x60.png" srcset="/brand/logo-200x60.png 1x, /brand/logo-400x120.png 2x" width="100" height="30" alt="haokit">
+        <img class="brand-logo brand-logo-dark" src="/brand/logo-200x60-dark.png" srcset="/brand/logo-200x60-dark.png 1x, /brand/logo-400x120-dark.png 2x" width="100" height="30" alt="">
+        <span class="brand-name" id="brandName">号工具</span>
+      </a>
+      <label class="sb-search">
+        <span id="searchIcon" aria-hidden="true"></span>
+        <input id="navSearch" type="search" placeholder="搜索工具" autocomplete="off" aria-label="搜索工具">
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+      <nav class="nav" id="nav"></nav>
+      <div class="sb-foot">
+        <div class="theme-seg" id="themeSeg" role="group" aria-label="主题"></div>
+        <p class="sb-note">令牌只经由本站服务端转发给微软，不做任何存储。<a href="/privacy">隐私说明</a></p>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <div class="main">
+      <div class="panel">
+        <header class="topbar">
+          <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="打开导航"></button>
+          <div class="tb-titles">
+            <div class="tb-line">
+              <span class="tb-group" id="pageGroup"></span>
+              <h1 id="pageTitle">全部工具</h1>
+            </div>
+            <p class="tb-desc" id="pageDesc"></p>
+          </div>
+        </header>
+        <main class="view" id="view" tabindex="-1"><!--seo-body--></main>
+      </div>
+    </div>
+  </div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script type="module" src="/assets/app.js"></script>
+</body>
+</html>

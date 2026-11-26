@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+*.log
+
+# 环境变量里可能有生产配置，只提交示例
+.env
+.env.*
+!.env.example
+
+# 本机开发工具的配置
+.claude/

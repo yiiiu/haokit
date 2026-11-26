@@ -1,0 +1,37 @@
+# Caddy 配置：自动申请和续期 HTTPS 证书，反向代理到本机的 Node 服务
+# sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+# 把下面的 haokit.run 换成你的域名
+
+haokit.run {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000
+
+	# 访问日志：只保留时间、IP、方法、路径、状态码、耗时，删掉请求头和响应头；
+	# Caddy 不记录请求内容，用户提交的令牌不会进日志
+	log {
+		output file /var/log/caddy/haokit.access.log {
+			roll_size 20MiB
+			roll_keep 10
+		}
+		format filter {
+			wrap json
+			fields {
+				request>headers delete
+				request>tls delete
+				resp_headers delete
+			}
+		}
+	}
+}
+
+# www 跳到主域名
+www.haokit.run {
+	redir https://haokit.run{uri} permanent
+}
+
+# ---------------------------------------------------------------
+# 如果域名套了 Cloudflare（橙色云朵）：
+#   1. 在 /etc/haokit.env 里设置 CLIENT_IP_HEADER=cf-connecting-ip，限流才能按访问者真实 IP 计算；
+#   2. 用防火墙只允许 Cloudflare 的 IP 段访问服务器的 80 / 443 端口（IP 段以 https://www.cloudflare.com/ips/ 为准），
+#      否则有人绕过 Cloudflare 直连服务器，就能伪造 cf-connecting-ip 头躲过限流；
+#   3. Cloudflare 后台 SSL/TLS 模式选 Full (strict)。

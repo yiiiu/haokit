@@ -1,0 +1,34 @@
+# systemd 服务：sudo cp deploy/haokit.service /etc/systemd/system/
+[Unit]
+Description=HaoKit 号工具
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=haokit
+Group=haokit
+WorkingDirectory=/opt/haokit
+EnvironmentFile=/etc/haokit.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=3
+
+# 安全加固：程序不需要写磁盘，也不需要访问其他用户的文件
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+# 日志交给 journald，按 deploy/journald-haokit.conf 限制总大小
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
