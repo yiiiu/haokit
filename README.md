@@ -234,6 +234,7 @@ public/
    ```js
    { id: 'example', name: '示例工具', desc: '…', icon: 'grid', group: 'mail', tone: 160,
      seo: { title: '示例工具 - 一句话卖点 | 号工具', description: '给搜索引擎看的一两句介绍' },
+     css: '/tools/example/example.css',   // 没有自己的样式可以不写
      load: () => import('./example/index.js') },
    ```
 
@@ -241,7 +242,7 @@ public/
 
 加好后页面地址就是 `/example`，侧边栏、首页卡片、页面标题和 sitemap 会自动出现，不用改别的地方。
 
-工具自己的样式放在工具目录里，在 `mount` 中用 `ctx.loadCss('/tools/example/example.css')` 加载。新分组加到 `registry.js` 的 `groups`，新图标加到 `assets/icons.js`。
+工具自己的样式放在工具目录里，地址写在注册表的 `css` 字段：外壳会等样式表和工具代码都加载好再挂载（期间显示加载圈），服务器也会在页面头部直接引用当前工具的样式表，刷新时不会先闪出没有样式的内容。不要在 `mount` 里再自己加载样式。新分组加到 `registry.js` 的 `groups`，新图标加到 `assets/icons.js`。
 
 <details>
 <summary><b>界面规范</b></summary>

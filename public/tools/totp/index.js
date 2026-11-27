@@ -1,7 +1,7 @@
 // 2FA 验证码：粘贴密钥，实时生成 TOTP 动态码。全部在浏览器本地计算，密钥不会发送到服务器。
 import { icon } from '../../assets/icons.js';
 import {
-  esc, toast, copyText, loadCss, store, hueOf, initialOf,
+  esc, toast, copyText, store, hueOf, initialOf,
   acceptFileDrop, pickTextFile, readClipboard, autoGrow,
 } from '../../assets/ui.js';
 import { ALGORITHMS, cryptoAvailable, selfTest, timeStep, totp } from '../../assets/lib/totp.js';
@@ -102,8 +102,6 @@ function template(s) {
 let draft = null;
 
 export function mount(root) {
-  loadCss('/tools/totp/totp.css');
-
   const settings = { ...DEFAULTS, remember: false, ...store.get(SETTINGS_KEY, {}) };
   const state = { items: [], invalid: [], cards: [], timer: null };
 

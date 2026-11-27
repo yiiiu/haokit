@@ -1,6 +1,6 @@
 // 账号格式转换：按列识别字段 → 选择输出字段和顺序 → 换分隔符、去重 → 复制或下载
 import { icon } from '../../assets/icons.js';
-import { esc, toast, copyText, loadCss, store, acceptFileDrop, pickTextFile, readClipboard, autoGrow } from '../../assets/ui.js';
+import { esc, toast, copyText, store, acceptFileDrop, pickTextFile, readClipboard, autoGrow } from '../../assets/ui.js';
 import { classify, detectSeparator, splitLine, stripLabel, ROLES, ROLE_LABEL, SEPARATORS } from '../../assets/lib/accounts.js';
 
 const SETTINGS_KEY = 'convert.settings';
@@ -123,8 +123,6 @@ function template(s) {
 const session = { text: null, overrides: {}, sig: '' };
 
 export function mount(root) {
-  loadCss('/tools/convert/convert.css');
-
   const settings = {
     inSep: 'auto',
     fields: [...PRESETS[0].fields],

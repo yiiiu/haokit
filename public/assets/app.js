@@ -135,7 +135,8 @@ async function route() {
   els.view.replaceChildren(host);
 
   try {
-    const mod = await tool.load();
+    // 工具代码和样式表都加载好再挂载，期间一直显示加载圈，避免先闪出没有样式的内容
+    const [mod] = await Promise.all([tool.load(), tool.css ? loadCss(tool.css) : null]);
     if (seq !== routeSeq) return; // 加载期间又切换了路由
     host.innerHTML = '';
     cleanup = (await mod.mount(host, ctx)) || null;

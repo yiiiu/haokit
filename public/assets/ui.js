@@ -63,13 +63,35 @@ export async function api(path, body) {
 }
 
 /** 按需加载工具自己的样式表 */
+const cssReady = new Map();
+
+/**
+ * 加载样式表（同一个地址只加载一次），返回加载完成后兑现的 Promise。
+ * 服务器已经写进页面头部的样式表（带 data-css）会直接复用；加载失败或 5 秒还没好也会兑现，不会卡住页面
+ */
 export function loadCss(href) {
-  if (document.querySelector(`link[data-css="${href}"]`)) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = href;
-  link.dataset.css = href;
-  document.head.append(link);
+  if (cssReady.has(href)) return cssReady.get(href);
+  let link = document.querySelector(`link[data-css="${href}"]`);
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.dataset.css = href;
+    document.head.append(link);
+  }
+  const ready = link.sheet
+    ? Promise.resolve()
+    : new Promise((resolve) => {
+        const done = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+        const timer = setTimeout(done, 5000);
+        link.addEventListener('load', done, { once: true });
+        link.addEventListener('error', done, { once: true });
+      });
+  cssReady.set(href, ready);
+  return ready;
 }
 
 /** localStorage 包装：任何异常都静默降级 */

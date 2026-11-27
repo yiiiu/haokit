@@ -1,7 +1,7 @@
 // Outlook / Hotmail 取件：三栏布局（账号 / 邮件列表 / 阅读区），窄屏时阅读区改为右侧抽屉
 import { icon } from '../../assets/icons.js';
 import {
-  esc, toast, copyText, api, loadCss, store, shortTime, fullTime, runPool, hueOf, initialOf,
+  esc, toast, copyText, api, store, shortTime, fullTime, runPool, hueOf, initialOf,
   openModal, confirmDialog, acceptFileDrop, pickTextFile, readClipboard, autoGrow,
 } from '../../assets/ui.js';
 import { extractCode } from '../../assets/lib/otp.js';
@@ -137,8 +137,6 @@ function template(s) {
 const session = { accounts: [], selectedKey: null, openMailId: null, filter: '', busy: false, restored: false, view: null };
 
 export function mount(root) {
-  loadCss('/tools/outlook/outlook.css');
-
   const settings = { folder: 'inbox', mode: 'auto', top: 10, remember: false, auto: false, codeOnly: false, ...store.get(SETTINGS_KEY, {}) };
   const state = session;
   // 只属于这一次挂载的东西：定时器、导入弹窗

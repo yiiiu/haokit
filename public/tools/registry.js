@@ -15,6 +15,7 @@
 //   tag    可选，卡片上的小标签
 //   tone   可选，首页封面的色相（0–360），默认 220
 //   seo    可选，{ title, description }：浏览器标题和搜索引擎看到的标题、描述
+//   css    可选，工具自己的样式表。外壳会等它加载完再挂载工具；服务器也会在页面头部直接引用，刷新时不会先闪出没有样式的内容
 //   soon   true 表示「即将上线」，只展示不可点
 //   load   () => import('./<目录>/index.js')
 
@@ -38,6 +39,7 @@ export const tools = [
       description:
         '用 refresh_token 在线读取 Outlook / Hotmail 收件箱和垃圾箱，支持 4 段、5 段、6 段等账号格式批量导入，自动识别邮件里的验证码，一键复制。',
     },
+    css: '/tools/outlook/outlook.css',
     load: () => import('./outlook/index.js'),
   },
   {
@@ -53,6 +55,7 @@ export const tools = [
       description:
         '粘贴 2FA 密钥即可实时生成 6 位动态验证码，相当于网页版谷歌验证器，支持批量、otpauth 链接和 UID|密码|2FA 格式，密钥只在浏览器本地计算。',
     },
+    css: '/tools/totp/totp.css',
     load: () => import('./totp/index.js'),
   },
   {
@@ -68,6 +71,7 @@ export const tools = [
       description:
         '把 ----、|、冒号等各种格式的账号批量转换成需要的格式：自动识别邮箱、密码、令牌、2FA 等字段，调整顺序、换分隔符、去重，一键复制或导出 txt。',
     },
+    css: '/tools/convert/convert.css',
     load: () => import('./convert/index.js'),
   },
 ];

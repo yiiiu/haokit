@@ -24,6 +24,7 @@ function pageFor(id) {
     name: t.name,
     title: t.seo?.title || `${t.name} | ${SITE.name}`,
     description: t.seo?.description || t.desc,
+    css: t.css,
   };
 }
 
@@ -89,6 +90,8 @@ export function renderPage(req, res) {
   const { html } = template();
   const out = html
     .replace(/<title>[\s\S]*?<\/title>/, headTags(page, siteBase(req), status))
+    // 当前工具的样式表直接写进页面（在 app.css 之后），和主样式并行下载，刷新时不会先闪出没有样式的内容
+    .replace('<!--tool-css-->', page.css ? `<link rel="stylesheet" href="${esc(page.css)}" data-css="${esc(page.css)}">` : '')
     .replace('<!--seo-body-->', noscriptBody(page))
     .replace('</body>', `${analyticsTag()}</body>`);
 
