@@ -1,0 +1,40 @@
+# 在 1Panel 服务器上用 Docker 运行号工具，由 1Panel 的 OpenResty 反向代理到 127.0.0.1:<PORT>
+# 端口写在 /etc/haokit.env 的 PORT 里（线上用随机高位端口），改完重建容器，并同步修改 1Panel 网站的代理地址
+# 启动 / 更新：docker compose -f /opt/haokit/deploy/docker-compose.yml up -d --build
+# 详细步骤见 deploy/1panel.md
+name: haokit
+
+services:
+  haokit:
+    build: ..
+    image: haokit:latest
+    container_name: haokit
+    restart: unless-stopped
+    # 用主机网络：程序只监听本机 127.0.0.1（不对外暴露），
+    # OpenResty 从本机转发过来，程序才能正确识别访问者真实 IP（限流按 IP 计算）
+    network_mode: host
+    env_file: /etc/haokit.env
+    environment:
+      # 强制只监听本机，即使配置文件里写错了 HOST 也不会暴露到公网
+      HOST: 127.0.0.1
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 384m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    healthcheck:
+      # $$PORT 由容器里的 shell 展开，取的是 /etc/haokit.env 里的端口
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${PORT:-3000}/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+      start_interval: 2s

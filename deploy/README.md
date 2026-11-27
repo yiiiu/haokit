@@ -1,5 +1,7 @@
 # 部署：号工具（HaoKit）
 
+> 服务器已经装了 1Panel 时，改看 [1panel.md](1panel.md)（Docker 运行，由 1Panel 的 OpenResty 反向代理）。本页是没有 1Panel 时的 Caddy + systemd 方式。
+
 目标环境：一台海外 VPS（香港 / 新加坡 / 日本，1 核 1–2 GB），Ubuntu 24.04，Node 22，Caddy 做 HTTPS 反向代理，systemd 管理进程。下面的命令都在服务器上执行，`haokit.run` 换成你的域名。
 
 ## 1. 准备

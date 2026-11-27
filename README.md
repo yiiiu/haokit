@@ -18,7 +18,7 @@ npm start          # 生产运行
 npm run dev        # 开发模式，改动后端代码自动重启
 ```
 
-打开 <http://127.0.0.1:3000>。部署到服务器见 [deploy/README.md](deploy/README.md)，全部配置项和说明见 [.env.example](.env.example)：
+打开 <http://127.0.0.1:3000>。部署到服务器见 [deploy/1panel.md](deploy/1panel.md)（服务器装了 1Panel，用 Docker 运行，当前线上用这套）或 [deploy/README.md](deploy/README.md)（Caddy + systemd），全部配置项和说明见 [.env.example](.env.example)：
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
@@ -113,7 +113,8 @@ server/
     rate-limit.js          # 按 IP 限流
     limiter.js             # 并发控制（排队、超时）
     template.js            # 读取 index.html 模板，计算内联脚本哈希
-deploy/                    # Caddyfile、systemd 服务、journald 日志上限、部署步骤
+deploy/                    # 两套部署方式：1Panel + Docker（docker-compose.yml、push.sh、1panel.md）；Caddy + systemd（Caddyfile、服务文件、日志上限、README.md）
+Dockerfile                 # 运行镜像（只装生产依赖，非 root 运行）
 public/
   index.html               # 外壳：侧边栏（logo、搜索、导航、主题）+ 悬浮内容面板；服务器在这里写入每页的 SEO 标签
   favicon.ico、site.webmanifest

@@ -1,0 +1,10 @@
+node_modules
+.git
+.claude
+.env
+.env.*
+deploy
+*.md
+# logo 原始素材，网站用的是整理后的 public/brand
+public/haokit-rose-assets
+public/haokit-logo-assets
