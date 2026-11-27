@@ -19,7 +19,7 @@ function parseTrustProxy(v) {
 export const config = {
   port: num(process.env.PORT, 3000),
   host: process.env.HOST || '127.0.0.1',
-  // 网站正式地址，用于 canonical 和 sitemap，例如 https://haokit.run；不填时按请求的域名生成
+  // 网站正式地址，用于 canonical 和 sitemap，例如 https://haokit.xyz；不填时按请求的域名生成
   siteUrl: (process.env.SITE_URL || '').trim().replace(/\/+$/, ''),
   trustProxy: parseTrustProxy(process.env.TRUST_PROXY || 'loopback'),
   // 套了 Cloudflare 时设为 cf-connecting-ip，用它取访问者真实 IP（只在请求来自本机代理时才读取）

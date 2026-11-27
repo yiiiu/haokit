@@ -23,7 +23,7 @@ npm run dev        # 开发模式，改动后端代码自动重启
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
 | `PORT` / `HOST` | `3000` / `127.0.0.1` | 监听端口和地址；生产环境保持 127.0.0.1，由 Caddy 对外 |
-| `SITE_URL` | 空（按请求域名生成） | 正式地址，如 `https://haokit.run`，用于 canonical 和 sitemap |
+| `SITE_URL` | 空（按请求域名生成） | 正式地址，如 `https://haokit.xyz`，用于 canonical 和 sitemap |
 | `TRUST_PROXY` | `loopback` | 信任哪些反向代理转发的真实 IP 和协议 |
 | `CLIENT_IP_HEADER` | 空 | 套 Cloudflare 时设为 `cf-connecting-ip` |
 | `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_SEC` | `300` / `600` | 取件接口每个 IP 每 10 分钟最多 300 次；设为 0 关闭 |

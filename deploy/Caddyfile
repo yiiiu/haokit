@@ -1,8 +1,8 @@
 # Caddy 配置：自动申请和续期 HTTPS 证书，反向代理到本机的 Node 服务
 # sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
-# 把下面的 haokit.run 换成你的域名
+# 把下面的 haokit.xyz 换成你的域名
 
-haokit.run {
+haokit.xyz {
 	encode zstd gzip
 	reverse_proxy 127.0.0.1:3000
 
@@ -25,8 +25,8 @@ haokit.run {
 }
 
 # www 跳到主域名
-www.haokit.run {
-	redir https://haokit.run{uri} permanent
+www.haokit.xyz {
+	redir https://haokit.xyz{uri} permanent
 }
 
 # ---------------------------------------------------------------

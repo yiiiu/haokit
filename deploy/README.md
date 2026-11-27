@@ -2,7 +2,7 @@
 
 > 服务器已经装了 1Panel 时，改看 [1panel.md](1panel.md)（Docker 运行，由 1Panel 的 OpenResty 反向代理）。本页是没有 1Panel 时的 Caddy + systemd 方式。
 
-目标环境：一台海外 VPS（香港 / 新加坡 / 日本，1 核 1–2 GB），Ubuntu 24.04，Node 22，Caddy 做 HTTPS 反向代理，systemd 管理进程。下面的命令都在服务器上执行，`haokit.run` 换成你的域名。
+目标环境：一台海外 VPS（香港 / 新加坡 / 日本，1 核 1–2 GB），Ubuntu 24.04，Node 22，Caddy 做 HTTPS 反向代理，systemd 管理进程。下面的命令都在服务器上执行，`haokit.xyz` 换成你的域名。
 
 ## 1. 准备
 
@@ -63,7 +63,7 @@ journalctl -u haokit -f
 
 ## 6. 配置 Caddy
 
-把 `deploy/Caddyfile` 里的 `haokit.run` 换成你的域名，然后：
+把 `deploy/Caddyfile` 里的 `haokit.xyz` 换成你的域名，然后：
 
 ```bash
 sudo mkdir -p /var/log/caddy && sudo chown caddy:caddy /var/log/caddy
@@ -78,15 +78,15 @@ sudo cp /opt/haokit/deploy/Caddyfile /etc/caddy/Caddyfile && sudo caddy validate
 ## 7. 上线后检查
 
 ```bash
-curl -s https://haokit.run/api/health
+curl -s https://haokit.xyz/api/health
 ```
 
 ```bash
-curl -sI https://haokit.run/ | grep -iE "strict-transport|content-security|x-frame"
+curl -sI https://haokit.xyz/ | grep -iE "strict-transport|content-security|x-frame"
 ```
 
 ```bash
-curl -s https://haokit.run/sitemap.xml
+curl -s https://haokit.xyz/sitemap.xml
 ```
 
 再用浏览器打开每个工具，确认 2FA 验证码正常显示（必须是 HTTPS）、取件能读到邮件、控制台没有报错。
@@ -110,15 +110,15 @@ cd /opt/haokit && sudo git fetch --tags && sudo git checkout v1.0.1 && sudo npm 
 
 ## 10. 上线后要做的
 
-- 在线监控：UptimeRobot 免费版新建 HTTP 监控，地址 `https://haokit.run/api/health`，间隔 5 分钟，配置邮件或 Telegram 告警。
-- 搜索引擎：在百度搜索资源平台和 Google Search Console 验证网站，提交 `https://haokit.run/sitemap.xml`。
+- 在线监控：UptimeRobot 免费版新建 HTTP 监控，地址 `https://haokit.xyz/api/health`，间隔 5 分钟，配置邮件或 Telegram 告警。
+- 搜索引擎：在百度搜索资源平台和 Google Search Console 验证网站，提交 `https://haokit.xyz/sitemap.xml`。
 - 访问统计：按下面「访问统计」一节开通 Cloudflare Web Analytics。
 
 ## 访问统计
 
 用 Cloudflare Web Analytics，免费、不用 Cookie，域名不用迁到 Cloudflare。
 
-1. 注册并登录 Cloudflare，进入左侧的 **Web Analytics**，点 **Add a site**，填 `haokit.run`，点 **Done**。
+1. 注册并登录 Cloudflare，进入左侧的 **Web Analytics**，点 **Add a site**，填 `haokit.xyz`，点 **Done**。
 2. 在 **Manage site** 里显示的代码中，复制 `"token": "…"` 引号里的那串字母数字。
 3. 在 `/etc/haokit.env` 里加一行 `CF_ANALYTICS_TOKEN=刚才那串`，然后重启：
 
@@ -129,7 +129,7 @@ sudo systemctl restart haokit
 4. 检查是否生效（有输出就对了），几分钟后 Cloudflare 后台开始出数据：
 
 ```bash
-curl -s https://haokit.run/ | grep -o "cloudflareinsights[^\"]*"
+curl -s https://haokit.xyz/ | grep -o "cloudflareinsights[^\"]*"
 ```
 
 开启后服务器会自动放行统计脚本的安全策略（CSP），隐私说明页也会自动换成「使用了 Cloudflare 统计」的说明，不用改代码。
