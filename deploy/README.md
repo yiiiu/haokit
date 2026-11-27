@@ -110,7 +110,7 @@ cd /opt/haokit && sudo git fetch --tags && sudo git checkout v1.0.1 && sudo npm 
 
 - 在线监控：UptimeRobot 免费版新建 HTTP 监控，地址 `https://haokit.run/api/health`，间隔 5 分钟，配置邮件或 Telegram 告警。
 - 搜索引擎：在百度搜索资源平台和 Google Search Console 验证网站，提交 `https://haokit.run/sitemap.xml`。
-- 隐私说明：`public/tools/privacy.js` 里的「联系方式」还是「待补充」，上线前填上。
+- 访问统计：按下面「访问统计」一节开通 Cloudflare Web Analytics。
 
 ## 访问统计
 

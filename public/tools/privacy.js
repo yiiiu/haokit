@@ -1,4 +1,4 @@
-// 隐私说明页（初稿，上线前请根据实际情况审核修改，特别是「联系方式」）
+// 隐私说明页（功能或数据处理方式有变化时，记得同步修改这里并更新日期）
 import { SITE } from '../assets/site.js';
 
 const UPDATED = '2026 年 11 月 27 日';
@@ -50,7 +50,11 @@ export function mount(el) {
       <p>本站工具按现状提供，请只用于管理你有权使用的账号。</p>
 
       <h2>联系方式</h2>
-      <p>有问题或建议，可以通过（待补充）联系我们。</p>
+      <p>有问题或建议，可以通过下面任一方式联系我们：</p>
+      <ul>
+        <li>QQ：3098407410</li>
+        <li>Telegram：<a href="https://t.me/moonx_8888" target="_blank" rel="noopener noreferrer">@moonx_8888</a></li>
+      </ul>
 
       <p class="prose-meta">最后更新：${UPDATED}</p>
     </article>`;
