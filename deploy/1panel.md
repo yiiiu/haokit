@@ -4,7 +4,7 @@
 
 - 号工具跑在 Docker 容器 `haokit` 里，代码在 `/opt/haokit`，配置在 `/etc/haokit.env`。
 - 容器用主机网络，只监听本机 `127.0.0.1`，公网访问不到；由 1Panel 的 OpenResty 反向代理并提供 HTTPS。
-- 端口写在 `/etc/haokit.env` 的 `PORT` 里，线上用随机高位端口（当前 `10753`）。要换端口：改 `PORT`，运行 `deploy/push.sh` 重建容器，再把 1Panel 网站的代理地址改成新端口。
+- 端口写在 `/etc/haokit.env` 的 `PORT` 里，线上建议用 10000–32000 之间没被占用的随机端口。要换端口：改 `PORT`，运行 `deploy/push.sh` 重建容器，再把 1Panel 网站的代理地址改成新端口。
 - 容器以非 root 用户运行、文件系统只读、内存上限 384 MB，日志最多保留 3 个 10 MB 文件。
 
 ## 1. 上线或更新代码
@@ -12,7 +12,7 @@
 在本机项目根目录运行（第二个参数是 SSH 私钥路径）：
 
 ```bash
-deploy/push.sh root@186.241.81.72 ~/.ssh/id_ed25519_186_241_81_72
+deploy/push.sh root@服务器IP ~/.ssh/你的私钥
 ```
 
 脚本会上传代码、重建镜像、重启容器，并等健康检查通过。第一次运行时还要在服务器上创建配置文件：
@@ -30,7 +30,7 @@ cd /opt && mv haokit haokit.bad && mv haokit.old haokit && cd haokit && docker c
 ## 2. 在 1Panel 里建网站
 
 1. 域名解析：在域名后台加一条 A 记录，指向服务器 IP。
-2. 1Panel →「网站」→「创建网站」→ 选「反向代理」：主域名填你的域名，代理地址填 `http://127.0.0.1:10753`（即 `/etc/haokit.env` 里的 `PORT`）。
+2. 1Panel →「网站」→「创建网站」→ 选「反向代理」：主域名填你的域名，代理地址填 `http://127.0.0.1:端口`（端口就是 `/etc/haokit.env` 里的 `PORT`）。
 3. 进入这个网站的设置 →「HTTPS」→ 启用，用 1Panel 申请 Let's Encrypt 证书（HTTP 验证即可），打开「HTTP 跳转 HTTPS」。
    `www` 也解析到服务器时：在网站的「域名」里加上 `www.haokit.xyz`，证书要同时包含两个域名，再在「重定向」里把 `www.haokit.xyz` 301 跳到 `https://haokit.xyz`（目标地址要写 `https://`，写成 `http://` 会多跳一次明文 HTTP）。否则访问 www 会落到 1Panel 的默认站点，HTTPS 直接打不开。
 4. 在服务器上把 `/etc/haokit.env` 里的 `SITE_URL` 改成正式地址（如 `https://haokit.xyz`，注意去掉行首的 `#`），然后重建容器：
